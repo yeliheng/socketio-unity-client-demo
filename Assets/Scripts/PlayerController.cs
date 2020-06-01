@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using DG.Tweening;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 /*
@@ -14,10 +15,14 @@ public class PlayerController : MonoBehaviour {
 	private PlayerMoveSync moveSync;
 	private bool isLocalPlayer = false;
 	private Renderer player;
+	private bl_Joystick joystick;
+	private float moveHorizontal;
+	private float moveVertical;
 	//private string username;
 	// Use this for initialization
 	void Start () {
 		rb2d = GetComponent<Rigidbody2D>();
+		joystick = FindObjectOfType<bl_Joystick>();
 		moveSync = GetComponent<PlayerMoveSync>();
 		//username = GetComponentInChildren<TextMesh>().text;
 		player = GetComponent<Renderer>();
@@ -27,18 +32,23 @@ public class PlayerController : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	void FixedUpdate () {
 		if (isLocalPlayer)
 		{
-			float moveHorizontal = Input.GetAxis("Horizontal");
-			float moveVertical = Input.GetAxis("Vertical");
-			Vector2 movement = new Vector2(moveHorizontal, moveVertical);
-			rb2d.AddForce(movement * speed);
+			//float moveX;
+			 moveHorizontal = joystick.Horizontal;
+			 moveVertical = joystick.Vertical;
+			//Debug.Log("x: " + moveHorizontal + " y: " + moveVertical);
+			//Vector2 movement = new Vector2(moveHorizontal, moveVertical);
+			//rb2d.AddForce(movement * speed);
+			//float moveX += moveHorizontal * speed;
+
 			x = transform.position.x;
 			y = transform.position.y;
+			rb2d.DOMove(new Vector2(x + moveHorizontal * speed, y + moveVertical * speed),3);
 
 		}
-		if (rb2d.velocity.x != 0 || rb2d.velocity.y != 0)
+		if (moveHorizontal != 0 || moveVertical != 0)
 		{
 			moveSync.Sync(x, y);
 		}
